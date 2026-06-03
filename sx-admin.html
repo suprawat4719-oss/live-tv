@@ -1,0 +1,1294 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SX Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600&family=Kanit:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --bg:#0a0b0f;--bg2:#0d0f18;--bg3:#13151e;--bg4:#1a1f2e;
+  --accent:#6366f1;--green:#22c55e;--red:#ef4444;--amber:#f59e0b;
+  --txt:#fff;--muted:#9ca3af;--dim:#4b5563;
+  --border:rgba(255,255,255,.07);--border2:rgba(255,255,255,.12);
+}
+html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(--txt);font-family:'Sarabun',sans-serif;}
+
+/* ── SIDEBAR ── */
+.layout{display:flex;height:100vh;}
+.sidebar{width:220px;background:var(--bg2);border-right:1px solid var(--border);
+  display:flex;flex-direction:column;flex-shrink:0;}
+.sidebar-logo{padding:18px 16px 14px;border-bottom:1px solid var(--border);}
+.logo-txt{font-family:'Kanit',sans-serif;font-weight:800;font-size:1.1rem;color:var(--accent);}
+.logo-sub{font-size:.65rem;color:var(--muted);margin-top:1px;}
+.nav-list{flex:1;padding:10px 8px;overflow-y:auto;}
+.nav-item{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:9px;
+  cursor:pointer;transition:all .18s;color:var(--muted);font-family:'Kanit',sans-serif;
+  font-size:.8rem;font-weight:600;margin-bottom:2px;}
+.nav-item:hover{background:var(--bg4);color:var(--txt);}
+.nav-item.active{background:rgba(99,102,241,.15);color:var(--accent);border:1px solid rgba(99,102,241,.25);}
+.nav-item .nav-icon{font-size:1rem;width:20px;text-align:center;}
+.nav-sep{font-size:.62rem;color:var(--dim);padding:10px 12px 4px;letter-spacing:.08em;text-transform:uppercase;}
+.sidebar-footer{padding:12px 10px;border-top:1px solid var(--border);}
+.user-row{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:8px;
+  background:rgba(99,102,241,.1);border:1px solid rgba(99,102,241,.2);}
+.user-av{width:28px;height:28px;border-radius:50%;background:rgba(99,102,241,.3);
+  display:flex;align-items:center;justify-content:center;font-size:.72rem;font-weight:700;color:#a5b4fc;}
+.user-name{font-size:.72rem;font-family:'Kanit',sans-serif;font-weight:600;color:#a5b4fc;flex:1;}
+.logout-btn{background:none;border:none;color:var(--dim);cursor:pointer;font-size:.7rem;
+  font-family:'Kanit',sans-serif;}
+.logout-btn:hover{color:#f87171;}
+
+/* ── MAIN ── */
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden;}
+.topbar{height:52px;background:var(--bg2);border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;padding:0 20px;flex-shrink:0;}
+.page-title{font-family:'Kanit',sans-serif;font-weight:700;font-size:.95rem;}
+.topbar-right{display:flex;align-items:center;gap:8px;}
+#clock{font-family:'Kanit',sans-serif;font-weight:700;font-size:.82rem;color:var(--muted);}
+.content{flex:1;overflow-y:auto;padding:18px 20px;}
+.content::-webkit-scrollbar{width:4px;}
+.content::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:4px;}
+
+/* ── PAGES ── */
+.page{display:none;}
+.page.active{display:block;}
+
+/* ── STAT CARDS ── */
+.stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:18px;}
+.stat-card{background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:14px 16px;}
+.stat-label{font-size:.68rem;color:var(--muted);margin-bottom:6px;font-family:'Kanit',sans-serif;font-weight:600;letter-spacing:.04em;}
+.stat-val{font-family:'Kanit',sans-serif;font-weight:800;font-size:1.6rem;}
+.stat-sub{font-size:.65rem;color:var(--dim);margin-top:2px;}
+
+/* ── CARD ── */
+.card{background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:14px;}
+.card-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+.card-title{font-family:'Kanit',sans-serif;font-weight:700;font-size:.88rem;
+  display:flex;align-items:center;gap:7px;}
+.card-cnt{color:var(--dim);font-size:.68rem;font-weight:400;}
+
+/* ── BUTTONS ── */
+.btn{padding:7px 14px;border-radius:8px;font-size:.76rem;font-weight:700;cursor:pointer;
+  border:none;transition:opacity .2s;white-space:nowrap;font-family:'Kanit',sans-serif;}
+.btn:hover{opacity:.85;}
+.btn:disabled{opacity:.4;cursor:not-allowed;}
+.btn-primary{background:var(--accent);color:#fff;}
+.btn-success{background:var(--green);color:#000;}
+.btn-danger{background:var(--red);color:#fff;}
+.btn-amber{background:var(--amber);color:#000;}
+.btn-ghost{background:var(--bg4);color:var(--muted);border:1px solid var(--border2);}
+.btn-sm{padding:4px 10px;font-size:.68rem;}
+.btn-xs{padding:2px 7px;font-size:.62rem;}
+
+/* ── FORM ── */
+.form-row{display:flex;gap:8px;margin-bottom:8px;align-items:flex-start;flex-wrap:wrap;}
+.form-col{display:flex;flex-direction:column;gap:4px;flex:1;min-width:120px;}
+.form-col label{font-size:.65rem;color:var(--muted);font-family:'Kanit',sans-serif;font-weight:600;}
+.inp{background:rgba(255,255,255,.06);border:1px solid var(--border2);border-radius:8px;
+  padding:8px 11px;color:var(--txt);font-family:'Sarabun',sans-serif;font-size:.78rem;
+  outline:none;transition:border .2s;width:100%;}
+.inp:focus{border-color:var(--accent);}
+.inp-sm{padding:6px 9px;font-size:.72rem;}
+select.inp option{background:#1a1f2e;}
+
+/* ── TABLE ── */
+.tbl{width:100%;border-collapse:collapse;}
+.tbl th{font-family:'Kanit',sans-serif;font-size:.68rem;font-weight:600;color:var(--muted);
+  padding:7px 10px;text-align:left;border-bottom:1px solid var(--border);}
+.tbl td{padding:8px 10px;font-size:.76rem;border-bottom:1px solid rgba(255,255,255,.04);
+  vertical-align:middle;}
+.tbl tr:last-child td{border-bottom:none;}
+.tbl tr:hover td{background:rgba(255,255,255,.02);}
+
+/* ── BADGES ── */
+.badge{display:inline-flex;align-items:center;gap:3px;font-size:.6rem;padding:2px 8px;
+  border-radius:20px;font-weight:700;font-family:'Kanit',sans-serif;white-space:nowrap;}
+.badge-hls{background:rgba(74,222,128,.15);color:#4ade80;border:1px solid rgba(74,222,128,.3);}
+.badge-yt{background:rgba(248,113,113,.15);color:#f87171;border:1px solid rgba(248,113,113,.3);}
+.badge-mp4{background:rgba(147,197,253,.15);color:#93c5fd;border:1px solid rgba(147,197,253,.3);}
+.badge-cat{background:rgba(99,102,241,.15);color:#a5b4fc;border:1px solid rgba(99,102,241,.3);}
+.badge-nocat{background:rgba(245,158,11,.15);color:#fcd34d;border:1px solid rgba(245,158,11,.3);}
+.badge-active{background:rgba(34,197,94,.15);color:#4ade80;border:1px solid rgba(34,197,94,.3);}
+.badge-inactive{background:rgba(239,68,68,.15);color:#f87171;border:1px solid rgba(239,68,68,.3);}
+
+/* ── DRAG & DROP KANBAN ── */
+.kanban{display:grid;gap:10px;overflow-x:auto;padding-bottom:8px;}
+.kanban-col{background:var(--bg3);border:1px solid var(--border);border-radius:12px;
+  min-width:160px;display:flex;flex-direction:column;overflow:hidden;min-height:200px;}
+.kanban-col.drag-over{border-color:var(--accent);background:rgba(99,102,241,.08);}
+.kanban-hdr{padding:10px 12px;border-bottom:1px solid var(--border);background:rgba(255,255,255,.03);}
+.kanban-hdr-name{font-family:'Kanit',sans-serif;font-weight:700;font-size:.8rem;}
+.kanban-hdr-cnt{font-size:.62rem;color:var(--dim);margin-top:1px;}
+.kanban-body{padding:8px;flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:4px;max-height:360px;}
+.kanban-body::-webkit-scrollbar{width:3px;}
+.kanban-body::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);}
+.k-card{display:flex;align-items:center;gap:6px;padding:6px 8px;border-radius:7px;
+  cursor:grab;transition:all .15s;user-select:none;border:1px solid transparent;}
+.k-card:active{cursor:grabbing;}
+.k-card.dragging{opacity:.35;border-style:dashed;border-color:var(--accent);}
+.k-card:hover{background:rgba(255,255,255,.05);border-color:var(--border2);}
+.k-emoji{font-size:.9rem;width:20px;text-align:center;flex-shrink:0;}
+.k-name{font-size:.72rem;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.k-type{font-size:.54rem;padding:1px 4px;border-radius:4px;flex-shrink:0;}
+.drop-hint{display:flex;align-items:center;justify-content:center;padding:20px 8px;
+  color:var(--dim);font-size:.72rem;text-align:center;flex:1;}
+.kanban-save{padding:10px 14px;border-top:1px solid var(--border);display:flex;gap:8px;align-items:center;}
+
+/* ── QUICK ASSIGN ── */
+.qa-row{display:flex;align-items:center;gap:10px;padding:9px 14px;
+  border-bottom:1px solid rgba(255,255,255,.04);transition:background .12s;}
+.qa-row:last-child{border-bottom:none;}
+.qa-row:hover{background:rgba(255,255,255,.025);}
+.qa-row.qa-changed{background:rgba(245,158,11,.07);border-left:2px solid var(--amber);}
+.qa-icon{font-size:.95rem;width:22px;text-align:center;flex-shrink:0;}
+.qa-name{flex:1;min-width:0;}
+
+/* ── SEARCH ── */
+.search-bar{display:flex;gap:8px;margin-bottom:12px;}
+
+/* ── MEMBER PLAN PICKER ── */
+.plan-pick{display:flex;gap:6px;flex-wrap:wrap;}
+.plan-btn{padding:5px 12px;border-radius:8px;font-size:.72rem;font-weight:600;
+  cursor:pointer;border:1px solid var(--border2);background:var(--bg4);color:var(--muted);
+  font-family:'Kanit',sans-serif;transition:all .2s;}
+.plan-btn.sel{background:var(--accent);color:#fff;border-color:var(--accent);}
+
+/* ── TOAST ── */
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);
+  background:rgba(15,17,28,.97);border:1px solid var(--border2);color:#fff;
+  padding:8px 18px;border-radius:9px;font-size:.76rem;display:none;z-index:9999;
+  white-space:nowrap;box-shadow:0 6px 24px rgba(0,0,0,.5);}
+
+/* ── MODAL ── */
+.modal-bg{position:fixed;inset:0;z-index:500;background:rgba(0,0,0,.78);
+  display:none;align-items:center;justify-content:center;}
+.modal-bg.open{display:flex;}
+.modal{background:var(--bg3);border:1px solid var(--border2);border-radius:14px;
+  padding:22px;width:380px;max-width:92vw;display:flex;flex-direction:column;gap:13px;
+  max-height:90vh;overflow-y:auto;}
+.modal h3{font-family:'Kanit',sans-serif;font-weight:700;font-size:.92rem;}
+.modal-actions{display:flex;gap:7px;justify-content:flex-end;margin-top:4px;}
+
+/* ── CONFIRM ── */
+.confirm-bg{position:fixed;inset:0;z-index:600;background:rgba(0,0,0,.82);
+  display:none;align-items:center;justify-content:center;}
+.confirm-bg.open{display:flex;}
+.confirm-box{background:var(--bg3);border:1px solid rgba(239,68,68,.3);border-radius:14px;
+  padding:22px;width:300px;max-width:88vw;text-align:center;display:flex;flex-direction:column;gap:12px;}
+.confirm-box h3{font-family:'Kanit',sans-serif;font-weight:700;font-size:.9rem;color:#f87171;}
+.confirm-box p{font-size:.76rem;color:var(--muted);line-height:1.6;}
+.confirm-acts{display:flex;gap:7px;justify-content:center;}
+
+/* ── EMPTY ── */
+.empty{text-align:center;padding:28px;color:var(--dim);font-size:.78rem;}
+
+/* ── LOADING ── */
+.loading-screen{position:fixed;inset:0;z-index:1000;background:var(--bg);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;}
+.loading-screen.hide{display:none;}
+.spin{width:38px;height:38px;border:3px solid rgba(255,255,255,.1);
+  border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* RESPONSIVE */
+@media(max-width:700px){
+  .sidebar{width:56px;}
+  .sidebar-logo .logo-txt,.logo-sub,.nav-item span,.nav-sep,.user-name,.logout-btn{display:none;}
+  .nav-item{justify-content:center;padding:10px;}
+  .stat-grid{grid-template-columns:1fr 1fr;}
+  .main{overflow:hidden;}
+}
+</style>
+</head>
+<body>
+
+<!-- LOADING -->
+<div class="loading-screen" id="loadingScreen">
+  <div style="font-family:'Kanit',sans-serif;font-weight:800;font-size:1.6rem;color:var(--accent);">SX ADMIN</div>
+  <div class="spin"></div>
+  <div style="font-size:.76rem;color:var(--muted);">กำลังเชื่อมต่อ Firebase...</div>
+</div>
+
+<div class="layout">
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-txt">SX ADMIN</div>
+      <div class="logo-sub">Control Panel</div>
+    </div>
+    <div class="nav-list">
+      <div class="nav-sep">จัดการ</div>
+      <div class="nav-item active" onclick="gotoPage('dashboard')">
+        <span class="nav-icon">📊</span><span>Dashboard</span>
+      </div>
+      <div class="nav-item" onclick="gotoPage('channels')">
+        <span class="nav-icon">📡</span><span>ช่องทีวี</span>
+      </div>
+      <div class="nav-item" onclick="gotoPage('categories')">
+        <span class="nav-icon">📂</span><span>หมวดหมู่</span>
+      </div>
+      <div class="nav-item" onclick="gotoPage('organize')">
+        <span class="nav-icon">🎯</span><span>จัดหมวด (Drag)</span>
+      </div>
+      <div class="nav-sep">สมาชิก</div>
+      <div class="nav-item" onclick="gotoPage('members')">
+        <span class="nav-icon">👥</span><span>สมาชิก</span>
+      </div>
+      <div class="nav-item" onclick="gotoPage('addmember')">
+        <span class="nav-icon">➕</span><span>เพิ่มสมาชิก</span>
+      </div>
+    </div>
+    <div class="sidebar-footer">
+      <div class="user-row">
+        <div class="user-av" id="sideAvatar">A</div>
+        <div class="user-name" id="sideUser">Admin</div>
+        <button class="logout-btn" onclick="doLogout()">ออก</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN -->
+  <div class="main">
+    <div class="topbar">
+      <div class="page-title" id="pageTitle">📊 Dashboard</div>
+      <div class="topbar-right">
+        <div id="clock">--:--:--</div>
+        <a href="https://suprawat4719-oss.github.io/live-tv/" target="_blank"
+          style="font-size:.72rem;color:var(--accent);text-decoration:none;
+          background:rgba(99,102,241,.1);border:1px solid rgba(99,102,241,.3);
+          padding:4px 10px;border-radius:8px;">
+          📺 ดู TV App
+        </a>
+      </div>
+    </div>
+
+    <div class="content">
+
+      <!-- ── PAGE: DASHBOARD ── -->
+      <div class="page active" id="page-dashboard">
+        <div class="stat-grid">
+          <div class="stat-card">
+            <div class="stat-label">ช่องทั้งหมด</div>
+            <div class="stat-val" id="s-channels" style="color:var(--accent);">—</div>
+            <div class="stat-sub">รายการ</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">หมวดหมู่</div>
+            <div class="stat-val" id="s-cats" style="color:var(--green);">—</div>
+            <div class="stat-sub">หมวด</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">สมาชิก</div>
+            <div class="stat-val" id="s-members" style="color:var(--amber);">—</div>
+            <div class="stat-sub">คน</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">ยังไม่จัดหมวด</div>
+            <div class="stat-val" id="s-uncat" style="color:var(--red);">—</div>
+            <div class="stat-sub">ช่อง</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-hdr">
+            <div class="card-title">🕐 กิจกรรมล่าสุด</div>
+          </div>
+          <div id="recentActivity">
+            <div class="empty">กำลังโหลด...</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-hdr">
+            <div class="card-title">⚠️ ช่องที่ยังไม่มีหมวดหมู่</div>
+            <button class="btn btn-primary btn-sm" onclick="gotoPage('organize')">จัดหมวดเลย →</button>
+          </div>
+          <div id="uncatPreview"></div>
+        </div>
+      </div>
+
+      <!-- ── PAGE: CHANNELS ── -->
+      <div class="page" id="page-channels">
+        <div class="card">
+          <div class="card-hdr">
+            <div class="card-title">➕ เพิ่มช่องใหม่</div>
+          </div>
+          <div class="form-row">
+            <div class="form-col">
+              <label>ชื่อช่อง *</label>
+              <input class="inp" id="chName" placeholder="เช่น Rouge TV">
+            </div>
+            <div class="form-col">
+              <label>คำอธิบาย</label>
+              <input class="inp" id="chSub" placeholder="เช่น France · Live">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-col" style="flex:3;">
+              <label>URL (HLS / MP4 / YouTube) *</label>
+              <input class="inp" id="chUrl" placeholder="https://...">
+            </div>
+            <div class="form-col" style="flex:1;min-width:80px;">
+              <label>Emoji</label>
+              <input class="inp" id="chEmoji" placeholder="🇫🇷" maxlength="4" style="text-align:center;font-size:1.1rem;" autocomplete="off" autocorrect="off" spellcheck="false">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-col">
+              <label>หมวดหมู่</label>
+              <select class="inp" id="chCat">
+                <option value="">-- เลือกหมวด --</option>
+              </select>
+            </div>
+            <div style="display:flex;align-items:flex-end;">
+              <button class="btn btn-primary" onclick="addChannel()">＋ เพิ่มช่อง</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-hdr">
+            <div class="card-title">📋 ช่องทั้งหมด <span class="card-cnt" id="chTableCnt"></span></div>
+          </div>
+          <div class="search-bar">
+            <input class="inp" id="chSearch" placeholder="🔍 ค้นหาชื่อช่อง..." oninput="renderChTable()">
+            <select class="inp" style="max-width:140px;" id="chFilterCat" onchange="renderChTable()">
+              <option value="">ทุกหมวด</option>
+            </select>
+          </div>
+          <div style="overflow-x:auto;">
+            <table class="tbl">
+              <thead><tr>
+                <th>ช่อง</th><th>URL</th><th>ประเภท</th><th>หมวด</th><th>จัดการ</th>
+              </tr></thead>
+              <tbody id="chTableBody"><tr><td colspan="5" class="empty">กำลังโหลด...</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── PAGE: CATEGORIES ── -->
+      <div class="page" id="page-categories">
+        <div class="card">
+          <div class="card-hdr">
+            <div class="card-title">➕ เพิ่มหมวดหมู่</div>
+          </div>
+          <div class="form-row">
+            <div class="form-col" style="max-width:70px;">
+              <label>Emoji</label>
+              <input class="inp" id="catEmoji" placeholder="📡" maxlength="4" style="text-align:center;font-size:1.2rem;" autocomplete="off" autocorrect="off" spellcheck="false">
+            </div>
+            <div class="form-col">
+              <label>ชื่อหมวดหมู่ *</label>
+              <input class="inp" id="catName" placeholder="เช่น ช่องสด, หนัง">
+            </div>
+            <div style="display:flex;align-items:flex-end;">
+              <button class="btn btn-primary" onclick="addCategory()">＋ เพิ่ม</button>
+            </div>
+          </div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:6px;">
+            <span style="font-size:.68rem;color:var(--dim);align-self:center;">เพิ่มด่วน:</span>
+            <button class="btn btn-ghost btn-sm" onclick="quickCat('📡','ช่องสด')">📡 ช่องสด</button>
+            <button class="btn btn-ghost btn-sm" onclick="quickCat('🎬','หนัง')">🎬 หนัง</button>
+            <button class="btn btn-ghost btn-sm" onclick="quickCat('📺','ซีรีส์')">📺 ซีรีส์</button>
+            <button class="btn btn-ghost btn-sm" onclick="quickCat('🎵','เพลง')">🎵 เพลง</button>
+            <button class="btn btn-ghost btn-sm" onclick="quickCat('⚽','กีฬา')">⚽ กีฬา</button>
+            <button class="btn btn-ghost btn-sm" onclick="quickCat('📰','ข่าว')">📰 ข่าว</button>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-hdr">
+            <div class="card-title">📂 หมวดหมู่ทั้งหมด <span class="card-cnt" id="catTableCnt"></span></div>
+          </div>
+          <table class="tbl">
+            <thead><tr><th>หมวดหมู่</th><th>จำนวนช่อง</th><th>จัดการ</th></tr></thead>
+            <tbody id="catTableBody"><tr><td colspan="3" class="empty">กำลังโหลด...</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ── PAGE: ORGANIZE ── -->
+      <div class="page" id="page-organize">
+
+        <!-- toolbar -->
+        <div class="card" style="margin-bottom:10px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">
+            <div>
+              <div style="font-family:'Kanit',sans-serif;font-weight:700;font-size:.88rem;" id="orgModeTitle">⚡ Quick Assign — จัดหมวดหมู่เร็ว</div>
+              <div style="font-size:.7rem;color:var(--muted);margin-top:2px;" id="orgModeSub">เลือกหมวดให้แต่ละช่องได้เลย — บันทึกทีเดียว</div>
+            </div>
+            <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+              <div style="display:flex;background:var(--bg4);border:1px solid var(--border2);border-radius:8px;overflow:hidden;">
+                <button id="modeQuickBtn" class="btn btn-sm" onclick="switchOrgMode('quick')"
+                  style="border-radius:0;border:none;background:var(--accent);color:#fff;">⚡ Quick</button>
+                <button id="modeDragBtn" class="btn btn-sm" onclick="switchOrgMode('drag')"
+                  style="border-radius:0;border:none;background:transparent;color:var(--muted);">🎯 Drag</button>
+              </div>
+              <button class="btn btn-ghost btn-sm" onclick="resetOrganize()">↺ รีเซ็ต</button>
+              <button class="btn btn-success" id="saveDragBtn" onclick="saveDragChanges()" disabled>
+                💾 บันทึก (<span id="changeCount">0</span>)
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- QUICK ASSIGN PANEL -->
+        <div id="quickAssignPanel">
+          <div style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap;align-items:center;">
+            <input class="inp" id="qaSearch" placeholder="🔍 ค้นหาชื่อช่อง..." oninput="renderQuickAssign()"
+              style="flex:1;min-width:160px;" autocomplete="off">
+            <select class="inp" id="qaFilterStatus" onchange="renderQuickAssign()" style="max-width:150px;">
+              <option value="uncat" selected>ยังไม่จัดหมวด</option>
+              <option value="">ทุกช่อง</option>
+              <option value="cat">มีหมวดแล้ว</option>
+            </select>
+            <select class="inp" id="qaFilterCat" onchange="renderQuickAssign()" style="max-width:150px;">
+              <option value="">ทุกหมวด</option>
+            </select>
+          </div>
+          <div style="display:flex;gap:8px;margin-bottom:10px;align-items:center;flex-wrap:wrap;
+            padding:8px 12px;background:var(--bg4);border:1px solid var(--border);border-radius:9px;">
+            <label style="font-size:.72rem;color:var(--muted);font-family:'Kanit',sans-serif;
+              display:flex;align-items:center;gap:6px;cursor:pointer;">
+              <input type="checkbox" id="qaSelectAll" onchange="toggleSelectAll(this.checked)"
+                style="width:14px;height:14px;accent-color:var(--accent);">
+              เลือกทั้งหมด
+            </label>
+            <span style="font-size:.72rem;color:var(--dim);" id="qaSelectedCount">เลือก 0</span>
+            <div style="flex:1;"></div>
+            <select class="inp inp-sm" id="qaBulkCat" style="max-width:160px;">
+              <option value="">-- กำหนดหมวดให้ที่เลือก --</option>
+            </select>
+            <button class="btn btn-amber btn-sm" onclick="bulkAssign()">✅ กำหนด</button>
+          </div>
+          <div class="card" style="padding:0;overflow:hidden;">
+            <div id="qaList" style="max-height:calc(100vh - 360px);overflow-y:auto;">
+              <div class="empty">กำลังโหลด...</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- DRAG PANEL -->
+        <div id="dragPanel" style="display:none;">
+          <div class="kanban" id="kanbanBoard" style="grid-template-columns:repeat(auto-fill,minmax(180px,1fr));"></div>
+        </div>
+
+      </div>
+
+      <!-- ── PAGE: MEMBERS ── -->
+      <div class="page" id="page-members">
+        <div class="card">
+          <div class="card-hdr">
+            <div class="card-title">👥 สมาชิกทั้งหมด <span class="card-cnt" id="memberCnt"></span></div>
+            <button class="btn btn-primary btn-sm" onclick="gotoPage('addmember')">＋ เพิ่มสมาชิก</button>
+          </div>
+          <div class="search-bar">
+            <input class="inp" id="memberSearch" placeholder="🔍 ค้นหาอีเมล / ชื่อ..." oninput="renderMemberTable()">
+            <select class="inp" style="max-width:130px;" id="memberFilter" onchange="renderMemberTable()">
+              <option value="">ทุกสถานะ</option>
+              <option value="active">ใช้งานได้</option>
+              <option value="expired">หมดอายุ</option>
+            </select>
+          </div>
+          <div style="overflow-x:auto;">
+            <table class="tbl">
+              <thead><tr>
+                <th>สมาชิก</th><th>อีเมล</th><th>สถานะ</th><th>หมดอายุ</th><th>จัดการ</th>
+              </tr></thead>
+              <tbody id="memberTableBody"><tr><td colspan="5" class="empty">กำลังโหลด...</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── PAGE: ADD MEMBER ── -->
+      <div class="page" id="page-addmember">
+        <div class="card" style="max-width:480px;">
+          <div class="card-hdr">
+            <div class="card-title">➕ เพิ่มสมาชิกใหม่</div>
+          </div>
+          <div class="form-row">
+            <div class="form-col">
+              <label>ชื่อ *</label>
+              <input class="inp" id="mbrName" placeholder="ชื่อสมาชิก">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-col">
+              <label>อีเมล *</label>
+              <input class="inp" id="mbrEmail" type="email" placeholder="email@example.com">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-col">
+              <label>อายุสมาชิก *</label>
+              <div class="plan-pick" id="planPick">
+                <div class="plan-btn" data-months="1" onclick="selectPlan(this)">1 เดือน</div>
+                <div class="plan-btn" data-months="2" onclick="selectPlan(this)">2 เดือน</div>
+                <div class="plan-btn" data-months="3" onclick="selectPlan(this)">3 เดือน</div>
+                <div class="plan-btn" data-months="6" onclick="selectPlan(this)">6 เดือน</div>
+                <div class="plan-btn" data-months="12" onclick="selectPlan(this)">1 ปี</div>
+              </div>
+            </div>
+          </div>
+          <div id="expirePreview" style="font-size:.72rem;color:var(--amber);margin-top:2px;display:none;">
+            📅 หมดอายุ: <span id="expireDate"></span>
+          </div>
+          <div class="form-row">
+            <div class="form-col">
+              <label>หมายเหตุ</label>
+              <input class="inp" id="mbrNote" placeholder="เช่น จ่ายเงินแล้ว, ทดสอบ">
+            </div>
+          </div>
+          <div class="modal-actions">
+            <button class="btn btn-ghost" onclick="gotoPage('members')">← กลับ</button>
+            <button class="btn btn-primary" id="addMbrBtn" onclick="addMember()">➕ เพิ่มสมาชิก</button>
+          </div>
+          <div style="margin-top:10px;padding:10px;background:rgba(99,102,241,.08);border-radius:8px;
+            border:1px solid rgba(99,102,241,.2);font-size:.7rem;color:#a5b4fc;line-height:1.7;">
+            ℹ️ ระบบจะสร้างบัญชีใน Firebase Auth อัตโนมัติ<br>
+            รหัสผ่านเริ่มต้น: <b>Sx@2025</b> (แจ้งสมาชิกให้เปลี่ยน)
+          </div>
+        </div>
+      </div>
+
+    </div><!-- end content -->
+  </div><!-- end main -->
+</div><!-- end layout -->
+
+<!-- MODALS -->
+<div class="modal-bg" id="editChModal">
+  <div class="modal">
+    <h3>✏️ แก้ไขช่อง</h3>
+    <input type="hidden" id="editChId">
+    <div class="form-col"><label>ชื่อ</label><input class="inp" id="editChName"></div>
+    <div class="form-col"><label>คำอธิบาย</label><input class="inp" id="editChSub"></div>
+    <div class="form-col"><label>URL</label><input class="inp" id="editChUrl"></div>
+    <div class="form-col"><label>Emoji</label><input class="inp" id="editChEmoji" maxlength="4" style="width:70px;text-align:center;font-size:1.1rem;" autocomplete="off" autocorrect="off" spellcheck="false"></div>
+    <div class="form-col"><label>หมวดหมู่</label>
+      <select class="inp" id="editChCat"><option value="">-- เลือก --</option></select></div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('editChModal')">ยกเลิก</button>
+      <button class="btn btn-primary" onclick="saveEditChannel()">บันทึก</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-bg" id="extendModal">
+  <div class="modal">
+    <h3>📅 ต่ออายุสมาชิก</h3>
+    <input type="hidden" id="extendMbrId">
+    <div style="font-size:.8rem;color:var(--muted);margin-bottom:4px;" id="extendMbrName"></div>
+    <div class="form-col"><label>ต่ออายุ</label>
+      <div class="plan-pick" id="extendPlanPick">
+        <div class="plan-btn" data-months="1" onclick="selectExtendPlan(this)">1 เดือน</div>
+        <div class="plan-btn" data-months="2" onclick="selectExtendPlan(this)">2 เดือน</div>
+        <div class="plan-btn" data-months="3" onclick="selectExtendPlan(this)">3 เดือน</div>
+        <div class="plan-btn" data-months="6" onclick="selectExtendPlan(this)">6 เดือน</div>
+        <div class="plan-btn" data-months="12" onclick="selectExtendPlan(this)">1 ปี</div>
+      </div>
+    </div>
+    <div id="extendPreview" style="font-size:.72rem;color:var(--amber);display:none;">
+      📅 หมดอายุใหม่: <span id="extendDate"></span>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('extendModal')">ยกเลิก</button>
+      <button class="btn btn-success" onclick="confirmExtend()">✅ ต่ออายุ</button>
+    </div>
+  </div>
+</div>
+
+<div class="confirm-bg" id="confirmBg">
+  <div class="confirm-box">
+    <h3>🗑 ยืนยันการลบ</h3>
+    <p id="confirmMsg">ต้องการลบรายการนี้?</p>
+    <div class="confirm-acts">
+      <button class="btn btn-ghost" onclick="closeConfirm()">ยกเลิก</button>
+      <button class="btn btn-danger" onclick="runConfirm()">ลบเลย</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- FIREBASE -->
+<script type="module">
+import{initializeApp}from"https://www.gstatic.com/firebasejs/11.8.1/firebase-app.js";
+import{getAuth,createUserWithEmailAndPassword,signOut,onAuthStateChanged}
+  from"https://www.gstatic.com/firebasejs/11.8.1/firebase-auth.js";
+import{getFirestore,collection,doc,addDoc,updateDoc,deleteDoc,
+  onSnapshot,query,orderBy,getDocs,writeBatch}
+  from"https://www.gstatic.com/firebasejs/11.8.1/firebase-firestore.js";
+
+const fbApp=initializeApp({
+  apiKey:"AIzaSyAD2jvyVvHwOJ-0QRZ1zMexb_LnqRppHCU",
+  authDomain:"live-tv-app-d1d10.firebaseapp.com",
+  projectId:"live-tv-app-d1d10",
+  storageBucket:"live-tv-app-d1d10.firebasestorage.app",
+  messagingSenderId:"1075235027115",
+  appId:"1:1075235027115:web:5712330b090612e6db9fee"
+});
+const auth=getAuth(fbApp);
+const db=getFirestore(fbApp);
+
+// ── STATE ──
+let channels=[],categories=[],members=[];
+let dragItem=null;
+let confirmCb=null;
+let extendMonths=0;
+let unsubCh=null,unsubCat=null,unsubMbr=null;
+
+const ADMIN_EMAILS=["suprawat4719@gmail.com"];
+const GRAD_POOL=[
+  "linear-gradient(135deg,#1e1b4b,#6366f1)","linear-gradient(135deg,#064e3b,#10b981)",
+  "linear-gradient(135deg,#431407,#f97316)","linear-gradient(135deg,#4c0519,#f43f5e)",
+  "linear-gradient(135deg,#0c4a6e,#0ea5e9)","linear-gradient(135deg,#2e1065,#8b5cf6)",
+  "linear-gradient(135deg,#7f1d1d,#dc2626)","linear-gradient(135deg,#052e16,#22c55e)",
+];
+
+// ── CLOCK ──
+(function tick(){
+  const n=new Date(),p=v=>String(v).padStart(2,"0");
+  const el=document.getElementById("clock");
+  if(el)el.textContent=`${p(n.getHours())}:${p(n.getMinutes())}:${p(n.getSeconds())}`;
+  setTimeout(tick,1000);
+})();
+
+// ── AUTH ──
+onAuthStateChanged(auth,user=>{
+  document.getElementById("loadingScreen").classList.add("hide");
+  if(!user){
+    startListeners();
+    document.getElementById("sideUser").textContent="Dev Mode";
+    document.getElementById("sideAvatar").textContent="D";
+    return;
+  }
+  if(!ADMIN_EMAILS.includes(user.email)){
+    alert("ไม่มีสิทธิ์เข้าใช้งาน Admin");
+    signOut(auth); return;
+  }
+  startListeners();
+  const n=user.email.split("@")[0];
+  document.getElementById("sideUser").textContent=n;
+  document.getElementById("sideAvatar").textContent=n[0].toUpperCase();
+});
+
+window.doLogout=async()=>{await signOut(auth);};
+
+// ── LISTENERS ──
+function startListeners(){
+  const qCh=query(collection(db,"channels"),orderBy("createdAt","asc"));
+  unsubCh=onSnapshot(qCh,snap=>{
+    channels=snap.docs.map(d=>({id:d.id,...d.data()}));
+    onDataChange();
+  });
+  unsubCat=onSnapshot(collection(db,"categories"),snap=>{
+    categories=snap.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(a.order||0)-(b.order||0));
+    onDataChange();
+  });
+  unsubMbr=onSnapshot(collection(db,"members"),snap=>{
+    members=snap.docs.map(d=>({id:d.id,...d.data()}));
+    renderMemberTable();
+    document.getElementById("s-members").textContent=members.length;
+  });
+}
+
+function onDataChange(){
+  renderDashboard();
+  renderChTable();
+  renderCatTable();
+  if(Object.keys(dragChanges).length===0){
+    // re-render ตาม mode ปัจจุบัน
+    if(typeof orgMode!=='undefined'&&orgMode==='drag') renderKanban();
+    else renderQuickAssign();
+  }
+  populateSelects();
+}
+
+// ── NAVIGATION ──
+window.gotoPage=function(name){
+  document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
+  document.querySelectorAll(".nav-item").forEach(n=>n.classList.remove("active"));
+  document.getElementById("page-"+name).classList.add("active");
+  const titles={dashboard:"📊 Dashboard",channels:"📡 ช่องทีวี",
+    categories:"📂 หมวดหมู่",organize:"🎯 จัดหมวด (Drag & Drop)",
+    members:"👥 สมาชิก",addmember:"➕ เพิ่มสมาชิก"};
+  document.getElementById("pageTitle").textContent=titles[name]||name;
+  document.querySelectorAll(".nav-item").forEach(n=>{
+    if(n.getAttribute("onclick")?.includes(`'${name}'`))n.classList.add("active");
+  });
+};
+
+// ── DASHBOARD ──
+function renderDashboard(){
+  const uncat=channels.filter(c=>!c.category||c.category==="");
+  document.getElementById("s-channels").textContent=channels.length;
+  document.getElementById("s-cats").textContent=categories.length;
+  document.getElementById("s-uncat").textContent=uncat.length;
+
+  // recent (last 5 added)
+  const recent=[...channels].sort((a,b)=>(b.createdAt||0)-(a.createdAt||0)).slice(0,5);
+  document.getElementById("recentActivity").innerHTML=recent.length?
+    recent.map(ch=>`
+      <div style="display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid ${channels.indexOf(ch)<recent.length-1?"rgba(255,255,255,.05)":"transparent"}">
+        <span style="font-size:.9rem;">${ch.emoji||"📺"}</span>
+        <div style="flex:1;min-width:0;">
+          <div style="font-size:.78rem;">${ch.name}</div>
+          <div style="font-size:.65rem;color:var(--muted);">${ch.category||"ยังไม่จัดหมวด"}</div>
+        </div>
+        <span class="badge ${ch.category?"badge-cat":"badge-nocat"}">${ch.category||"ไม่มีหมวด"}</span>
+      </div>`).join("")
+    :`<div class="empty">ยังไม่มีช่อง</div>`;
+
+  // uncat preview
+  document.getElementById("uncatPreview").innerHTML=uncat.length?
+    `<div style="display:flex;flex-wrap:wrap;gap:5px;">${
+      uncat.slice(0,12).map(ch=>`<span class="badge badge-nocat">${ch.emoji||"📺"} ${ch.name}</span>`).join("")
+    }${uncat.length>12?`<span class="badge badge-ghost">+${uncat.length-12} อีก</span>`:""}</div>`
+    :`<div class="empty" style="color:var(--green);">✅ ทุกช่องมีหมวดหมู่แล้ว</div>`;
+}
+
+// ── POPULATE SELECTS ──
+function populateSelects(){
+  const opts=categories.map(c=>`<option value="${c.name}">${c.emoji||""} ${c.name}</option>`).join("");
+  ["chCat","editChCat","chFilterCat"].forEach(id=>{
+    const el=document.getElementById(id);
+    if(!el)return;
+    const cur=el.value;
+    const prefix=id==="chFilterCat"?`<option value="">ทุกหมวด</option>`:`<option value="">-- เลือกหมวด --</option>`;
+    el.innerHTML=prefix+opts;
+    if(cur)el.value=cur;
+  });
+}
+
+// ── CHANNELS TABLE ──
+function renderChTable(){
+  const q=(document.getElementById("chSearch")?.value||"").toLowerCase();
+  const fc=document.getElementById("chFilterCat")?.value||"";
+  let list=channels;
+  if(q)list=list.filter(c=>c.name.toLowerCase().includes(q));
+  if(fc)list=list.filter(c=>c.category===fc);
+  document.getElementById("chTableCnt").textContent=`(${list.length}/${channels.length})`;
+  const tb=document.getElementById("chTableBody");
+  if(!list.length){tb.innerHTML=`<tr><td colspan="5" class="empty">ไม่พบช่อง</td></tr>`;return;}
+  tb.innerHTML=list.map(ch=>{
+    const t=ch.type||"hls";
+    const bc=t==="youtube"?"badge-yt":t==="mp4"?"badge-mp4":"badge-hls";
+    return`<tr>
+      <td><div style="display:flex;align-items:center;gap:7px;">
+        <div style="width:30px;height:30px;border-radius:6px;background:${ch.bg||"#1e1b4b"};
+          display:flex;align-items:center;justify-content:center;font-size:.85rem;flex-shrink:0;">${ch.emoji||"📺"}</div>
+        <div><div style="font-size:.78rem;font-weight:600;">${ch.name}</div>
+        <div style="font-size:.63rem;color:var(--muted);">${ch.sub||""}</div></div>
+      </div></td>
+      <td><span style="font-size:.62rem;color:var(--dim);font-family:monospace;
+        white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:160px;display:block;">
+        ${ch.url?.slice(0,50)||"—"}${(ch.url?.length||0)>50?"...":""}</span></td>
+      <td><span class="badge ${bc}">${t.toUpperCase()}</span></td>
+      <td><span class="badge ${ch.category?"badge-cat":"badge-nocat"}">${ch.category||"ไม่มีหมวด"}</span></td>
+      <td><div style="display:flex;gap:4px;">
+        <button class="btn btn-ghost btn-xs" onclick="openEditCh('${ch.id}')">✏️</button>
+        <button class="btn btn-danger btn-xs" onclick="askDelete('ลบช่อง &quot;${ch.name}&quot;?',()=>deleteCh('${ch.id}'))">🗑</button>
+      </div></td>
+    </tr>`;
+  }).join("");
+}
+window.renderChTable=renderChTable;
+
+// ── ADD CHANNEL ──
+window.addChannel=async function(){
+  const name=document.getElementById("chName").value.trim();
+  const sub=document.getElementById("chSub").value.trim();
+  const url=document.getElementById("chUrl").value.trim();
+  const emoji=document.getElementById("chEmoji").value.trim()||"📺";
+  const cat=document.getElementById("chCat").value;
+  if(!name||!url){showToast("กรุณากรอกชื่อและ URL");return;}
+  const type=detectType(url);
+  const grad=GRAD_POOL[Math.floor(Math.random()*GRAD_POOL.length)];
+  try{
+    await addDoc(collection(db,"channels"),{
+      name,sub:sub||type.toUpperCase()+" · Live",url,type,category:cat,emoji,bg:grad,createdAt:Date.now()
+    });
+    showToast(`✅ เพิ่ม "${name}" แล้ว`);
+    ["chName","chSub","chUrl","chEmoji"].forEach(id=>document.getElementById(id).value="");
+    document.getElementById("chCat").value="";
+  }catch(e){showToast("ผิดพลาด: "+e.message);}
+};
+document.getElementById("chUrl").addEventListener("keydown",e=>{if(e.key==="Enter")addChannel();});
+
+// ── EDIT CHANNEL ──
+window.openEditCh=function(id){
+  const ch=channels.find(c=>c.id===id);
+  if(!ch)return;
+  document.getElementById("editChId").value=id;
+  document.getElementById("editChName").value=ch.name||"";
+  document.getElementById("editChSub").value=ch.sub||"";
+  document.getElementById("editChUrl").value=ch.url||"";
+  document.getElementById("editChEmoji").value=ch.emoji||"";
+  populateSelects();
+  setTimeout(()=>{document.getElementById("editChCat").value=ch.category||"";},100);
+  openModal("editChModal");
+};
+window.saveEditChannel=async function(){
+  const id=document.getElementById("editChId").value;
+  const data={
+    name:document.getElementById("editChName").value.trim(),
+    sub:document.getElementById("editChSub").value.trim(),
+    url:document.getElementById("editChUrl").value.trim(),
+    emoji:document.getElementById("editChEmoji").value.trim()||"📺",
+    category:document.getElementById("editChCat").value,
+  };
+  data.type=detectType(data.url);
+  try{
+    await updateDoc(doc(db,"channels",id),data);
+    showToast("✅ บันทึกแล้ว");
+    closeModal("editChModal");
+  }catch(e){showToast("ผิดพลาด: "+e.message);}
+};
+
+// ── DELETE CHANNEL ──
+async function deleteCh(id){
+  try{
+    await deleteDoc(doc(db,"channels",id));
+    showToast("🗑 ลบแล้ว");
+  }catch(e){showToast("ลบไม่ได้: "+e.message);}
+}
+
+// ── CATEGORIES ──
+function renderCatTable(){
+  const counts={};
+  channels.forEach(c=>{counts[c.category]=(counts[c.category]||0)+1;});
+  document.getElementById("catTableCnt").textContent=`(${categories.length})`;
+  const tb=document.getElementById("catTableBody");
+  if(!categories.length){tb.innerHTML=`<tr><td colspan="3" class="empty">ยังไม่มีหมวดหมู่</td></tr>`;return;}
+  tb.innerHTML=categories.map(cat=>{
+    const cnt=counts[cat.name]||0;
+    return`<tr>
+      <td><div style="display:flex;align-items:center;gap:8px;">
+        <span style="font-size:1.1rem;">${cat.emoji||"📁"}</span>
+        <span style="font-size:.82rem;font-weight:600;">${cat.name}</span>
+      </div></td>
+      <td><span style="font-size:.8rem;">${cnt} ช่อง</span></td>
+      <td><button class="btn btn-danger btn-xs"
+        onclick="askDelete('ลบหมวด &quot;${cat.name}&quot;? ${cnt>0?"(มี "+cnt+" ช่องอยู่ในหมวดนี้)":""}',()=>deleteCat('${cat.id}','${cat.name}'))">🗑 ลบ</button></td>
+    </tr>`;
+  }).join("");
+}
+
+window.addCategory=async function(){
+  const name=document.getElementById("catName").value.trim();
+  const emoji=document.getElementById("catEmoji").value.trim()||"📁";
+  if(!name){showToast("กรุณากรอกชื่อหมวดหมู่");return;}
+  if(categories.find(c=>c.name===name)){showToast(`มีหมวด "${name}" แล้ว`);return;}
+  const btn=document.querySelector("#page-categories .btn-primary");
+  if(btn){btn.disabled=true;btn.textContent="กำลังเพิ่ม...";}
+  try{
+    await addDoc(collection(db,"categories"),{name,emoji,order:categories.length,createdAt:Date.now()});
+    document.getElementById("catName").value="";
+    document.getElementById("catEmoji").value="";
+    showToast(`✅ เพิ่มหมวด "${name}" แล้ว`);
+  }catch(e){
+    console.error("addCategory error:",e);
+    showToast("ผิดพลาด: "+e.message);
+  }
+  if(btn){btn.disabled=false;btn.textContent="＋ เพิ่ม";}
+};
+document.getElementById("catName").addEventListener("keydown",e=>{if(e.key==="Enter")addCategory();});
+
+window.quickCat=async function(emoji,name){
+  if(categories.find(c=>c.name===name)){showToast(`มีหมวด "${name}" แล้ว`);return;}
+  try{
+    await addDoc(collection(db,"categories"),{name,emoji,order:categories.length,createdAt:Date.now()});
+    showToast(`✅ เพิ่มหมวด "${name}" แล้ว`);
+  }catch(e){showToast("ผิดพลาด: "+e.message);}
+};
+
+async function deleteCat(id,name){
+  try{
+    await deleteDoc(doc(db,"categories",id));
+    showToast(`🗑 ลบหมวด "${name}" แล้ว`);
+  }catch(e){showToast("ลบไม่ได้: "+e.message);}
+}
+window.deleteCat=deleteCat;
+
+// ── ORGANIZE MODE ──
+let orgMode='quick';
+let dragChanges={},qaSelections={};
+
+window.switchOrgMode=function(mode){
+  orgMode=mode;
+  document.getElementById('quickAssignPanel').style.display=mode==='quick'?'':'none';
+  document.getElementById('dragPanel').style.display=mode==='drag'?'':'none';
+  const qb=document.getElementById('modeQuickBtn');
+  const db2=document.getElementById('modeDragBtn');
+  qb.style.background=mode==='quick'?'var(--accent)':'transparent';
+  qb.style.color=mode==='quick'?'#fff':'var(--muted)';
+  db2.style.background=mode==='drag'?'var(--accent)':'transparent';
+  db2.style.color=mode==='drag'?'#fff':'var(--muted)';
+  document.getElementById('orgModeTitle').textContent=
+    mode==='quick'?'⚡ Quick Assign — จัดหมวดหมู่เร็ว':'🎯 Drag & Drop — ลากวาง';
+  document.getElementById('orgModeSub').textContent=
+    mode==='quick'?'เลือกหมวดให้แต่ละช่องได้เลย — บันทึกทีเดียว':
+    'ลากช่องจาก "ยังไม่จัด" ไปวางในหมวดที่ต้องการ';
+  if(mode==='drag') renderKanban(); else renderQuickAssign();
+};
+
+// populate qa selects
+function populateQaSelects(){
+  const opts=categories.map(c=>`<option value="${c.name}">${c.emoji||''} ${c.name}</option>`).join('');
+  ['qaFilterCat','qaBulkCat'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(!el)return;
+    const pre=id==='qaFilterCat'?'<option value="">ทุกหมวด</option>':'<option value="">-- กำหนดหมวดให้ที่เลือก --</option>';
+    el.innerHTML=pre+opts;
+  });
+}
+
+window.renderQuickAssign=function(){
+  populateQaSelects();
+  const q=(document.getElementById('qaSearch')?.value||'').toLowerCase();
+  const status=document.getElementById('qaFilterStatus')?.value||'';
+  const filterCat=document.getElementById('qaFilterCat')?.value||'';
+  const list=channels.filter(ch=>{
+    const eff=qaSelections[ch.id]!==undefined?qaSelections[ch.id]:(ch.category||'');
+    if(q&&!ch.name.toLowerCase().includes(q))return false;
+    if(status==='uncat'&&eff!=='')return false;
+    if(status==='cat'&&eff==='')return false;
+    if(filterCat&&eff!==filterCat)return false;
+    return true;
+  });
+  const container=document.getElementById('qaList');
+  if(!list.length){container.innerHTML=`<div class="empty">ไม่พบช่อง</div>`;updateQaCount();return;}
+  container.innerHTML=list.map(ch=>{
+    const eff=qaSelections[ch.id]!==undefined?qaSelections[ch.id]:(ch.category||'');
+    const changed=qaSelections[ch.id]!==undefined;
+    const catOpts=`<option value="">-- ไม่มีหมวด --</option>`+
+      categories.map(c=>`<option value="${c.name}" ${eff===c.name?'selected':''}>${c.emoji||''} ${c.name}</option>`).join('');
+    return`<div class="qa-row ${changed?'qa-changed':''}" id="qarow-${ch.id}">
+      <input type="checkbox" class="qa-chk" id="qaChk-${ch.id}" data-id="${ch.id}"
+        onchange="onQaCheck()" style="width:14px;height:14px;accent-color:var(--accent);flex-shrink:0;cursor:pointer;">
+      <div class="qa-icon">${ch.emoji||'📺'}</div>
+      <div class="qa-name">
+        <div style="font-size:.8rem;font-weight:600;">${ch.name}</div>
+        <div style="font-size:.62rem;color:var(--muted);">${ch.sub||((ch.type||'hls').toUpperCase()+' · Live')}</div>
+      </div>
+      <select class="inp inp-sm" data-id="${ch.id}" onchange="onQaChange('${ch.id}',this.value)"
+        style="max-width:155px;flex-shrink:0;${changed?'border-color:var(--amber);':''}">${catOpts}</select>
+      <span style="width:8px;flex-shrink:0;font-size:.6rem;color:var(--amber);">${changed?'●':''}</span>
+    </div>`;
+  }).join('');
+  updateQaCount();
+};
+
+window.onQaChange=function(id,newCat){
+  const orig=channels.find(c=>c.id===id)?.category||'';
+  if(newCat===orig){delete qaSelections[id];delete dragChanges[id];}
+  else{qaSelections[id]=newCat;dragChanges[id]=newCat;}
+  const row=document.getElementById('qarow-'+id);
+  if(row){
+    row.className='qa-row '+(qaSelections[id]!==undefined?'qa-changed':'');
+    const sel=row.querySelector('select');
+    if(sel)sel.style.borderColor=qaSelections[id]!==undefined?'var(--amber)':'';
+    const dot=row.querySelector('span[style*="color:var(--amber)"]');
+    if(dot)dot.textContent=qaSelections[id]!==undefined?'●':'';
+  }
+  updateQaCount();
+};
+
+window.onQaCheck=function(){updateQaCount();};
+
+window.toggleSelectAll=function(checked){
+  document.querySelectorAll('.qa-chk').forEach(cb=>{cb.checked=checked;});
+  updateQaCount();
+};
+
+function updateQaCount(){
+  const checked=document.querySelectorAll('.qa-chk:checked').length;
+  document.getElementById('qaSelectedCount').textContent=`เลือก ${checked}`;
+  const cnt=Object.keys(dragChanges).length;
+  document.getElementById('changeCount').textContent=cnt;
+  document.getElementById('saveDragBtn').disabled=cnt===0;
+}
+
+window.bulkAssign=function(){
+  const cat=document.getElementById('qaBulkCat').value;
+  const checked=[...document.querySelectorAll('.qa-chk:checked')];
+  if(!checked.length){showToast('กรุณาเลือกช่องก่อน');return;}
+  checked.forEach(cb=>{
+    const id=cb.dataset.id;
+    const orig=channels.find(c=>c.id===id)?.category||'';
+    if(cat===orig){delete qaSelections[id];delete dragChanges[id];}
+    else{qaSelections[id]=cat;dragChanges[id]=cat;}
+  });
+  renderQuickAssign();
+  showToast(`✅ กำหนดหมวดให้ ${checked.length} ช่องแล้ว — กด บันทึก`);
+};
+
+window.resetOrganize=function(){
+  dragChanges={};qaSelections={};
+  document.getElementById('changeCount').textContent='0';
+  document.getElementById('saveDragBtn').disabled=true;
+  if(orgMode==='drag')renderKanban(); else renderQuickAssign();
+  showToast('รีเซ็ตแล้ว');
+};
+
+// ── KANBAN DRAG & DROP ──
+let localChannels={};
+
+function renderKanban(){
+  // sync localChannels จาก dragChanges + channels
+  localChannels={};
+  channels.forEach(ch=>{
+    localChannels[ch.id]=dragChanges[ch.id]!==undefined?dragChanges[ch.id]:(ch.category||'');
+  });
+
+  const board=document.getElementById("kanbanBoard");
+  const allCols=[{name:"__uncat",emoji:"📌",label:"ยังไม่จัด"},...categories.map(c=>({name:c.name,emoji:c.emoji,label:c.name}))];
+
+  board.innerHTML=allCols.map(col=>{
+    const isUncat=col.name==="__uncat";
+    const items=channels.filter(ch=>isUncat?((!ch.category||ch.category==="")):ch.category===col.name);
+    const cards=items.map(ch=>buildKCard(ch)).join("");
+    return`<div class="kanban-col" id="kcol-${col.name}"
+      ondragover="event.preventDefault();document.getElementById('kcol-${col.name}').classList.add('drag-over')"
+      ondragleave="document.getElementById('kcol-${col.name}').classList.remove('drag-over')"
+      ondrop="dropTo('${col.name}',event)">
+      <div class="kanban-hdr">
+        <div class="kanban-hdr-name">${col.emoji||""} ${col.label}</div>
+        <div class="kanban-hdr-cnt" id="kcnt-${col.name}">${items.length} ช่อง</div>
+      </div>
+      <div class="kanban-body" id="kbody-${col.name}">
+        ${cards||`<div class="drop-hint">📥 ลากมาวาง</div>`}
+      </div>
+    </div>`;
+  }).join("");
+}
+
+function buildKCard(ch){
+  const t=ch.type||"hls";
+  const bc=t==="youtube"?"badge-yt":t==="mp4"?"badge-mp4":"badge-hls";
+  return`<div class="k-card" draggable="true" id="kc-${ch.id}"
+    ondragstart="startDrag('${ch.id}',event)"
+    ondragend="endDrag()">
+    <div class="k-emoji">${ch.emoji||"📺"}</div>
+    <div class="k-name" title="${ch.name}">${ch.name}</div>
+    <span class="k-type ${bc}">${t.toUpperCase()}</span>
+  </div>`;
+}
+
+window.startDrag=function(id,e){
+  dragItem=id;
+  setTimeout(()=>document.getElementById("kc-"+id)?.classList.add("dragging"),0);
+};
+window.endDrag=function(){
+  if(dragItem)document.getElementById("kc-"+dragItem)?.classList.remove("dragging");
+  dragItem=null;
+  document.querySelectorAll(".kanban-col").forEach(c=>c.classList.remove("drag-over"));
+};
+
+window.dropTo=function(colName,e){
+  e.preventDefault();
+  if(!dragItem)return;
+  document.querySelectorAll(".kanban-col").forEach(c=>c.classList.remove("drag-over"));
+  const newCat=colName==="__uncat"?"":colName;
+  const oldCat=localChannels[dragItem];
+  if(oldCat===newCat){dragItem=null;return;}
+
+  localChannels[dragItem]=newCat;
+
+  // check if change from original
+  const orig=channels.find(c=>c.id===dragItem)?.category||"";
+  if(newCat===orig){delete dragChanges[dragItem];}
+  else{dragChanges[dragItem]=newCat;}
+
+  const cnt=Object.keys(dragChanges).length;
+  document.getElementById("changeCount").textContent=cnt;
+  document.getElementById("saveDragBtn").disabled=cnt===0;
+
+  // re-render affected columns
+  reRenderKCol(oldCat||"__uncat");
+  reRenderKCol(colName);
+  dragItem=null;
+};
+
+function reRenderKCol(colName){
+  const body=document.getElementById("kbody-"+colName);
+  const cntEl=document.getElementById("kcnt-"+colName);
+  if(!body)return;
+  const isUncat=colName==="__uncat";
+  const items=Object.entries(localChannels)
+    .filter(([id,cat])=>isUncat?cat==="":cat===colName)
+    .map(([id])=>channels.find(c=>c.id===id))
+    .filter(Boolean);
+  if(cntEl)cntEl.textContent=items.length+" ช่อง";
+  body.innerHTML=items.map(ch=>buildKCard(ch)).join("")||`<div class="drop-hint">📥 ลากมาวาง</div>`;
+}
+
+window.saveDragChanges=async function(){
+  const btn=document.getElementById("saveDragBtn");
+  btn.disabled=true;btn.textContent="กำลังบันทึก...";
+  const entries=Object.entries(dragChanges);
+  try{
+    const batch=writeBatch(db);
+    entries.forEach(([id,cat])=>batch.update(doc(db,"channels",id),{category:cat}));
+    await batch.commit();
+    showToast(`✅ บันทึก ${entries.length} รายการแล้ว`);
+    dragChanges={};qaSelections={};
+    document.getElementById("changeCount").textContent="0";
+    btn.innerHTML=`💾 บันทึก (<span id="changeCount">0</span>)`;
+    btn.disabled=true;
+  }catch(e){
+    showToast("ผิดพลาด: "+e.message);
+    btn.disabled=false;
+    btn.innerHTML=`💾 บันทึก (<span id="changeCount">${Object.keys(dragChanges).length}</span>)`;
+  }
+};
+
+// ── MEMBERS ──
+function renderMemberTable(){
+  const q=(document.getElementById("memberSearch")?.value||"").toLowerCase();
+  const f=document.getElementById("memberFilter")?.value||"";
+  const now=Date.now();
+  let list=members;
+  if(q)list=list.filter(m=>(m.email||"").toLowerCase().includes(q)||(m.name||"").toLowerCase().includes(q));
+  if(f==="active")list=list.filter(m=>(m.expireAt||0)>now);
+  if(f==="expired")list=list.filter(m=>(m.expireAt||0)<=now);
+  document.getElementById("memberCnt").textContent=`(${list.length})`;
+  const tb=document.getElementById("memberTableBody");
+  if(!list.length){tb.innerHTML=`<tr><td colspan="5" class="empty">ไม่พบสมาชิก</td></tr>`;return;}
+  tb.innerHTML=list.map(m=>{
+    const exp=m.expireAt||0;
+    const active=exp>now;
+    const daysLeft=Math.ceil((exp-now)/86400000);
+    const expStr=exp?new Date(exp).toLocaleDateString("th-TH",{year:"numeric",month:"short",day:"numeric"}):"—";
+    return`<tr>
+      <td><div style="font-size:.8rem;font-weight:600;">${m.name||"—"}</div></td>
+      <td><div style="font-size:.72rem;color:var(--muted);">${m.email||"—"}</div></td>
+      <td><span class="badge ${active?"badge-active":"badge-inactive"}">${active?"ใช้งานได้":"หมดอายุ"}</span></td>
+      <td><div style="font-size:.72rem;">${expStr}
+        ${active?`<span style="color:var(--amber);margin-left:4px;">(${daysLeft}วัน)</span>`:""}
+      </div></td>
+      <td><div style="display:flex;gap:4px;">
+        <button class="btn btn-amber btn-xs" onclick="openExtend('${m.id}','${m.name||m.email}',${exp})">📅 ต่ออายุ</button>
+        <button class="btn btn-danger btn-xs" onclick="askDelete('ลบสมาชิก?',()=>deleteMember('${m.id}'))">🗑</button>
+      </div></td>
+    </tr>`;
+  }).join("");
+}
+window.renderMemberTable=renderMemberTable;
+
+// ── ADD MEMBER ──
+let selectedMonths=0;
+window.selectPlan=function(el){
+  document.querySelectorAll("#planPick .plan-btn").forEach(b=>b.classList.remove("sel"));
+  el.classList.add("sel");
+  selectedMonths=parseInt(el.dataset.months);
+  const exp=new Date();exp.setMonth(exp.getMonth()+selectedMonths);
+  document.getElementById("expireDate").textContent=exp.toLocaleDateString("th-TH",{year:"numeric",month:"long",day:"numeric"});
+  document.getElementById("expirePreview").style.display="block";
+};
+
+window.addMember=async function(){
+  const name=document.getElementById("mbrName").value.trim();
+  const email=document.getElementById("mbrEmail").value.trim();
+  const note=document.getElementById("mbrNote").value.trim();
+  if(!name||!email){showToast("กรุณากรอกชื่อและอีเมล");return;}
+  if(!selectedMonths){showToast("กรุณาเลือกอายุสมาชิก");return;}
+  const btn=document.getElementById("addMbrBtn");
+  btn.disabled=true;btn.textContent="กำลังเพิ่ม...";
+  const expireAt=Date.now()+(selectedMonths*30*24*60*60*1000);
+  try{
+    // สร้าง auth user
+    try{
+      await createUserWithEmailAndPassword(auth,email,"Sx@2025");
+    }catch(authErr){
+      if(authErr.code!=="auth/email-already-in-use")throw authErr;
+    }
+    // บันทึก member doc
+    await addDoc(collection(db,"members"),{
+      name,email,expireAt,months:selectedMonths,note,
+      status:"active",createdAt:Date.now()
+    });
+    showToast(`✅ เพิ่มสมาชิก "${name}" แล้ว`);
+    ["mbrName","mbrEmail","mbrNote"].forEach(id=>document.getElementById(id).value="");
+    document.querySelectorAll("#planPick .plan-btn").forEach(b=>b.classList.remove("sel"));
+    document.getElementById("expirePreview").style.display="none";
+    selectedMonths=0;
+    gotoPage("members");
+  }catch(e){showToast("ผิดพลาด: "+e.message);}
+  btn.disabled=false;btn.textContent="➕ เพิ่มสมาชิก";
+};
+
+// ── EXTEND MEMBER ──
+window.openExtend=function(id,name,currentExp){
+  document.getElementById("extendMbrId").value=id;
+  document.getElementById("extendMbrName").textContent=`สมาชิก: ${name}`;
+  extendMonths=0;
+  document.querySelectorAll("#extendPlanPick .plan-btn").forEach(b=>b.classList.remove("sel"));
+  document.getElementById("extendPreview").style.display="none";
+  window._extendCurrentExp=currentExp;
+  openModal("extendModal");
+};
+window.selectExtendPlan=function(el){
+  document.querySelectorAll("#extendPlanPick .plan-btn").forEach(b=>b.classList.remove("sel"));
+  el.classList.add("sel");
+  extendMonths=parseInt(el.dataset.months);
+  const base=Math.max(Date.now(),window._extendCurrentExp||Date.now());
+  const exp=new Date(base);exp.setMonth(exp.getMonth()+extendMonths);
+  document.getElementById("extendDate").textContent=exp.toLocaleDateString("th-TH",{year:"numeric",month:"long",day:"numeric"});
+  document.getElementById("extendPreview").style.display="block";
+};
+window.confirmExtend=async function(){
+  const id=document.getElementById("extendMbrId").value;
+  if(!extendMonths){showToast("กรุณาเลือกระยะเวลา");return;}
+  const base=Math.max(Date.now(),window._extendCurrentExp||Date.now());
+  const newExp=base+(extendMonths*30*24*60*60*1000);
+  try{
+    await updateDoc(doc(db,"members",id),{expireAt:newExp,status:"active"});
+    showToast("✅ ต่ออายุแล้ว");
+    closeModal("extendModal");
+  }catch(e){showToast("ผิดพลาด: "+e.message);}
+};
+
+async function deleteMember(id){
+  try{await deleteDoc(doc(db,"members",id));showToast("🗑 ลบสมาชิกแล้ว");}
+  catch(e){showToast("ลบไม่ได้: "+e.message);}
+}
+
+// ── UTILS ──
+function detectType(url){
+  if(!url)return"hls";
+  const u=url.toLowerCase();
+  if(u.includes("youtube.com")||u.includes("youtu.be"))return"youtube";
+  if(u.endsWith(".mp4")||u.includes(".mp4?"))return"mp4";
+  return"hls";
+}
+window.openModal=function(id){document.getElementById(id).classList.add("open");};
+window.closeModal=function(id){document.getElementById(id).classList.remove("open");};
+window.askDelete=function(msg,cb){
+  document.getElementById("confirmMsg").innerHTML=msg+"<br><small style='color:#f87171;'>ไม่สามารถกู้คืนได้</small>";
+  confirmCb=cb;
+  document.getElementById("confirmBg").classList.add("open");
+};
+window.closeConfirm=function(){document.getElementById("confirmBg").classList.remove("open");confirmCb=null;};
+window.runConfirm=function(){if(confirmCb)confirmCb();closeConfirm();};
+
+function showToast(msg){
+  const t=document.getElementById("toast");
+  t.textContent=msg;t.style.display="block";
+  clearTimeout(t._t);t._t=setTimeout(()=>t.style.display="none",3000);
+}
+document.addEventListener("keydown",e=>{
+  if(e.key==="Escape"){
+    document.querySelectorAll(".modal-bg,.confirm-bg").forEach(m=>m.classList.remove("open"));
+  }
+});
+document.querySelectorAll(".modal-bg").forEach(m=>m.addEventListener("click",e=>{
+  if(e.target===m&&!e.target.closest(".modal"))m.classList.remove("open");
+}));
+</script>
+</body>
+</html>

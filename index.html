@@ -168,6 +168,15 @@ body::before{
   background:linear-gradient(125deg,#0a0c1e 0%,#131040 35%,#1a0e2e 60%,#07080f 100%);
   animation:hero-drift 18s ease-in-out infinite alternate;
 }
+.hero-bg-img{
+  position:absolute;inset:-6%;
+  width:112%;height:112%;
+  object-fit:cover;
+  filter:blur(36px) saturate(1.3) brightness(.55);
+  opacity:0;transition:opacity .6s ease;
+  display:block;
+}
+.hero-bg-img.show{opacity:1;}
 @keyframes hero-drift{
   0%{transform:scale(1.05) translate(0,0);}
   100%{transform:scale(1.1) translate(-2%,-2%);}
@@ -215,6 +224,23 @@ body::before{
   position:absolute;inset:0;
   display:flex;align-items:center;justify-content:center;
   flex-direction:column;gap:8px;
+}
+.hero-poster-img{
+  position:relative;z-index:1;
+  height:78%;max-height:340px;
+  aspect-ratio:2/3;
+  object-fit:cover;
+  border-radius:14px;
+  border:1px solid rgba(255,255,255,.12);
+  box-shadow:0 24px 64px rgba(0,0,0,.7),0 0 0 1px rgba(124,111,247,.12);
+  display:none;
+  animation:poster-in .5s ease;
+}
+.hero-poster-img.show{display:block;}
+.hero-poster.has-img .hero-emoji-big{display:none;}
+@keyframes poster-in{
+  from{transform:translateY(14px);opacity:0;}
+  to{transform:translateY(0);opacity:1;}
 }
 .hero-emoji-big{
   font-size:6rem;line-height:1;
@@ -396,16 +422,16 @@ body::before{
 }
 .ch-row::-webkit-scrollbar{height:2px;}
 
-/* ── CHANNEL CARD ── */
+/* ── CHANNEL CARD (POSTER STYLE) ── */
 .ch-card{
-  flex-shrink:0;width:148px;
+  flex-shrink:0;width:138px;
   border-radius:var(--r);
   overflow:visible;cursor:pointer;
-  transition:transform .22s cubic-bezier(.34,1.56,.64,1);
+  transition:transform .25s cubic-bezier(.34,1.56,.64,1);
   scroll-snap-align:start;
   position:relative;
 }
-.ch-card:hover{transform:translateY(-4px);}
+.ch-card:hover{transform:translateY(-6px) scale(1.02);}
 .ch-card-inner{
   border-radius:var(--r);overflow:hidden;
   background:var(--surface);
@@ -414,7 +440,7 @@ body::before{
 }
 .ch-card:hover .ch-card-inner{
   border-color:var(--border2);
-  box-shadow:0 8px 32px rgba(0,0,0,.6),0 0 0 1px rgba(124,111,247,.1);
+  box-shadow:0 14px 40px rgba(0,0,0,.7),0 0 0 1px rgba(124,111,247,.15);
 }
 .ch-card.edit-mode{transform:translateY(0) rotate(-1deg);}
 .ch-card.edit-mode .ch-card-inner{
@@ -427,40 +453,82 @@ body::before{
 }
 
 .ch-thumb{
-  width:100%;height:96px;
+  width:100%;
+  aspect-ratio:2/3;
   display:flex;align-items:center;justify-content:center;
   flex-direction:column;gap:4px;
   position:relative;overflow:hidden;
 }
-.ch-thumb-ov{
+.ch-poster-img{
   position:absolute;inset:0;
-  background:linear-gradient(to top,rgba(0,0,0,.75) 0%,transparent 55%);
+  width:100%;height:100%;
+  object-fit:cover;
+  display:block;
+  transition:transform .4s ease;
+  z-index:0;
+}
+.ch-card:hover .ch-poster-img{transform:scale(1.07);}
+.ch-thumb-emoji{
+  z-index:1;position:relative;
+  font-size:2.2rem;line-height:1;
+  filter:drop-shadow(0 2px 10px rgba(0,0,0,.6));
+}
+.ch-thumb.has-img .ch-thumb-emoji{display:none;}
+.ch-thumb-ov{
+  position:absolute;inset:0;z-index:2;
+  background:linear-gradient(to top,rgba(0,0,0,.85) 0%,rgba(0,0,0,.25) 35%,transparent 60%);
+  pointer-events:none;
 }
 .ch-thumb-shine{
-  position:absolute;inset:0;
+  position:absolute;inset:0;z-index:2;
   background:linear-gradient(135deg,rgba(255,255,255,.06) 0%,transparent 50%);
   pointer-events:none;
 }
+.ch-thumb-title{
+  position:absolute;left:9px;right:9px;bottom:8px;z-index:3;
+  font-family:'Kanit',sans-serif;font-weight:600;
+  font-size:.72rem;line-height:1.35;color:#fff;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;
+  overflow:hidden;
+  text-shadow:0 1px 6px rgba(0,0,0,.8);
+  pointer-events:none;
+}
+.ch-play-hint{
+  position:absolute;inset:0;z-index:3;
+  display:flex;align-items:center;justify-content:center;
+  opacity:0;transition:opacity .2s;
+  background:rgba(0,0,0,.25);
+  pointer-events:none;
+}
+.ch-play-hint span{
+  width:42px;height:42px;border-radius:50%;
+  background:rgba(255,255,255,.92);color:#06070d;
+  display:flex;align-items:center;justify-content:center;
+  font-size:1rem;padding-left:3px;
+  box-shadow:0 4px 20px rgba(0,0,0,.5);
+}
+@media(hover:hover){.ch-card:hover .ch-play-hint{opacity:1;}}
 
 .type-badge{
-  position:absolute;top:7px;right:7px;
+  position:absolute;top:7px;right:7px;z-index:4;
   font-size:.52rem;padding:2px 6px;
   border-radius:4px;font-weight:700;
   font-family:'Kanit',sans-serif;
   letter-spacing:.05em;
   backdrop-filter:blur(6px);
+  background-color:rgba(0,0,0,.45);
 }
 .badge-hls{background:rgba(61,214,140,.15);color:#3dd68c;border:1px solid rgba(61,214,140,.3);}
 .badge-yt{background:rgba(240,64,96,.15);color:#f87171;border:1px solid rgba(240,64,96,.3);}
 .badge-mp4{background:rgba(96,165,250,.15);color:#93c5fd;border:1px solid rgba(96,165,250,.3);}
 
 .now-bar{
-  position:absolute;bottom:0;left:0;right:0;height:2px;
+  position:absolute;bottom:0;left:0;right:0;height:3px;z-index:4;
   background:linear-gradient(to right,var(--accent),#a78bfa,var(--red));
   box-shadow:0 0 8px var(--accent-glow);
 }
 
-.ch-info{padding:9px 10px 11px;}
+.ch-info{padding:8px 9px 10px;}
 .ch-card-name{
   font-family:'Kanit',sans-serif;font-weight:600;font-size:.78rem;
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
@@ -489,6 +557,23 @@ body::before{
   box-shadow:0 2px 10px rgba(240,64,96,.5);
 }
 .del-btn:hover{transform:scale(1.2);}
+.poster-btn{
+  position:absolute;top:-8px;right:-8px;
+  width:22px;height:22px;border-radius:50%;
+  background:var(--accent);border:2px solid var(--bg);
+  color:#fff;font-size:.6rem;
+  cursor:pointer;display:none;align-items:center;justify-content:center;
+  z-index:20;transition:transform .15s;
+  box-shadow:0 2px 10px var(--accent-glow);
+}
+.poster-btn:hover{transform:scale(1.2);}
+@media(hover:hover){
+  .ch-card:hover .poster-btn{display:flex;}
+  .ch-card.edit-mode .poster-btn{display:flex;}
+}
+@media(hover:none){
+  .ch-card.edit-mode .poster-btn{display:flex;}
+}
 @media(hover:hover){
   .ch-card:hover .del-btn{display:flex;}
   .ch-card.edit-mode .del-btn{display:flex;}
@@ -499,7 +584,7 @@ body::before{
 
 /* ── ADD CARD ── */
 .add-card{
-  flex-shrink:0;width:148px;height:140px;
+  flex-shrink:0;width:138px;aspect-ratio:2/3.55;
   border-radius:var(--r);
   border:1px dashed rgba(124,111,247,.25);
   display:flex;flex-direction:column;
@@ -895,8 +980,7 @@ body::before{
   .hero-content{padding:0 18px 24px;max-width:100%;}
   .hero-title{font-size:1.1rem;}
   .hero-desc{display:none;}
-  .ch-card{width:130px;}
-  .ch-thumb{height:84px;}
+  .ch-card{width:118px;}
   .navbar{padding:0 14px;}
   .nav-tab .tab-lbl{display:none;}
   .user-lbl{display:none;}
@@ -905,7 +989,7 @@ body::before{
 
 @media(max-width:380px){
   .nav-logo{font-size:.95rem;}
-  .ch-card{width:118px;}
+  .ch-card{width:106px;}
 }
 </style>
 </head>
@@ -953,12 +1037,14 @@ body::before{
   <div class="hero" id="hero" onclick="heroClick()">
     <div class="hero-bg-wrap">
       <div class="hero-bg"></div>
+      <img class="hero-bg-img" id="heroBgImg" alt="" aria-hidden="true">
       <div class="hero-grid"></div>
       <div class="hero-glow"></div>
     </div>
-    <div class="hero-poster">
+    <div class="hero-poster" id="heroPoster">
       <div class="hero-poster-inner">
         <div class="hero-emoji-big" id="heroEmojiBig">📺</div>
+        <img class="hero-poster-img" id="heroPosterImg" alt="">
       </div>
       <div class="hero-poster-grad"></div>
     </div>
@@ -1037,6 +1123,10 @@ body::before{
     <div class="field">
       <label>URL (HLS / MP4 / YouTube) *</label>
       <input id="mUrl" placeholder="https://...">
+    </div>
+    <div class="field">
+      <label>รูปปก (URL รูปภาพ)</label>
+      <input id="mPoster" placeholder="https://... (เว้นว่างได้ — ลิงก์ YouTube ดึงปกอัตโนมัติ)">
     </div>
     <div class="field">
       <label>หมวดหมู่ *</label>
@@ -1132,6 +1222,29 @@ const GRAD_POOL=[
 ];
 
 let isAdmin=false,currentCh=null,modalHls=null,deleteTarget=null;
+
+// ── POSTER HELPERS ──
+function ytVideoId(url){
+  if(!url)return null;
+  try{
+    if(url.includes("watch?v="))return new URL(url).searchParams.get("v");
+    if(url.includes("youtu.be/"))return url.split("youtu.be/")[1].split(/[?&]/)[0];
+    if(url.includes("/embed/")&&!url.includes("live_stream"))return url.split("/embed/")[1].split(/[?&]/)[0];
+  }catch(e){}
+  return null;
+}
+function posterUrl(ch){
+  if(ch.poster&&ch.poster.trim())return ch.poster.trim();
+  const vid=ytVideoId(ch.url);
+  if(vid)return`https://img.youtube.com/vi/${vid}/hqdefault.jpg`;
+  return null;
+}
+window._imgFail=function(img){
+  // รูปโหลดไม่ได้ → ซ่อนรูป กลับไปใช้ gradient+emoji เดิม
+  img.style.display="none";
+  const thumb=img.closest(".ch-thumb");
+  if(thumb)thumb.classList.remove("has-img");
+};
 let allChannels=[],allCategories=[],activeCat="all";
 let editModeCard=null,unsubCh=null,unsubCat=null,_curStreamUrl=null;
 const isTouch="ontouchstart" in window;
@@ -1271,21 +1384,24 @@ function buildCard(ch,cs){
   const isCur=currentCh&&currentCh.id===ch.id;
   const grad=ch.bg||GRAD_POOL[Math.abs(hashStr(ch.id))%GRAD_POOL.length];
   const delBtn=isAdmin?`<button class="del-btn" data-id="${ch.id}" data-name="${ch.name}">✕</button>`:"";
+  const posterBtn=isAdmin?`<button class="poster-btn" data-id="${ch.id}" title="ใส่/เปลี่ยนรูปปก">🖼</button>`:"";
   const catBadge=ch.category?`<div class="ch-card-cat" style="background:${cs.bg};border:1px solid ${cs.border};color:${cs.txt};">${ch.category}</div>`:"";
+  const pUrl=posterUrl(ch);
+  const posterImg=pUrl?`<img class="ch-poster-img" src="${pUrl}" alt="" loading="lazy" onerror="_imgFail(this)">`:"";
   return`<div class="ch-card${isCur?" active-card":""}" data-id="${ch.id}">
-    ${delBtn}
+    ${delBtn}${posterBtn}
     <div class="ch-card-inner">
-      <div class="ch-thumb" style="background:${grad};color:#fff;">
-        <div style="z-index:1;position:relative;display:flex;flex-direction:column;align-items:center;gap:2px;">
-          <span style="font-size:1.5rem;line-height:1;filter:drop-shadow(0 2px 8px rgba(0,0,0,.6));">${ch.emoji||"📺"}</span>
-        </div>
+      <div class="ch-thumb${pUrl?" has-img":""}" style="background:${grad};color:#fff;">
+        ${posterImg}
+        <span class="ch-thumb-emoji">${ch.emoji||"📺"}</span>
         <div class="ch-thumb-ov"></div>
         <div class="ch-thumb-shine"></div>
+        <div class="ch-thumb-title">${ch.name}</div>
+        <div class="ch-play-hint"><span>▶</span></div>
         <span class="type-badge ${bc}">${bt}</span>
         ${isCur?"<div class='now-bar'></div>":""}
       </div>
       <div class="ch-info">
-        <div class="ch-card-name">${ch.name}</div>
         <div class="ch-card-sub">${ch.sub||""}</div>
         ${catBadge}
       </div>
@@ -1305,19 +1421,19 @@ function attachCardEvents(){
     if(isTouch){
       let pressTimer=null;
       card.addEventListener("touchstart",e=>{
-        if(e.target.closest(".del-btn"))return;
+        if(e.target.closest(".del-btn")||e.target.closest(".poster-btn"))return;
         pressTimer=setTimeout(()=>enterEditMode(card),500);
       },{passive:true});
       card.addEventListener("touchend",()=>clearTimeout(pressTimer),{passive:true});
       card.addEventListener("touchmove",()=>clearTimeout(pressTimer),{passive:true});
       card.addEventListener("click",e=>{
-        if(e.target.closest(".del-btn"))return;
+        if(e.target.closest(".del-btn")||e.target.closest(".poster-btn"))return;
         if(card.classList.contains("edit-mode")){exitEditMode(card);return;}
         selectChannel(ch);
       });
     } else {
       card.addEventListener("click",e=>{
-        if(e.target.closest(".del-btn"))return;
+        if(e.target.closest(".del-btn")||e.target.closest(".poster-btn"))return;
         selectChannel(ch);
       });
     }
@@ -1329,6 +1445,14 @@ function attachCardEvents(){
       btn.addEventListener("click",e=>{
         e.stopPropagation();
         openConfirm(btn.dataset.id,btn.dataset.name);
+      });
+    });
+    document.querySelectorAll(".poster-btn").forEach(btn=>{
+      if(btn.dataset.evtBound==="1")return;
+      btn.dataset.evtBound="1";
+      btn.addEventListener("click",e=>{
+        e.stopPropagation();
+        editPoster(btn.dataset.id);
       });
     });
   }
@@ -1368,6 +1492,22 @@ function updateHero(ch){
   const grad=ch.bg||GRAD_POOL[Math.abs(hashStr(ch.id))%GRAD_POOL.length];
   document.getElementById("heroEmojiBig").textContent=ch.emoji||"📺";
   document.querySelector(".hero-bg").style.background=grad;
+  // ── poster image ──
+  const pUrl=posterUrl(ch);
+  const bgImg=document.getElementById("heroBgImg");
+  const pImg=document.getElementById("heroPosterImg");
+  const pWrap=document.getElementById("heroPoster");
+  if(pUrl){
+    pImg.onerror=()=>{pImg.classList.remove("show");pWrap.classList.remove("has-img");bgImg.classList.remove("show");};
+    pImg.onload=()=>{pImg.classList.add("show");pWrap.classList.add("has-img");};
+    pImg.src=pUrl;
+    bgImg.src=pUrl;
+    bgImg.classList.add("show");
+  }else{
+    pImg.classList.remove("show");pImg.removeAttribute("src");
+    pWrap.classList.remove("has-img");
+    bgImg.classList.remove("show");bgImg.removeAttribute("src");
+  }
   document.getElementById("heroTitle").textContent=ch.name;
   document.getElementById("heroDesc").textContent=ch.sub||"Live Stream";
   const cs=getCatStyle(ch.category||"");
@@ -1392,8 +1532,14 @@ window.openPlayerModal=function(ch){
   const modal=document.getElementById("playerModal");
   modal.classList.add("open");
   const icon=document.getElementById("pmIcon");
-  icon.textContent=ch.emoji||"📺";
-  icon.style.cssText=`background:${ch.bg||"#1e1b4b"};width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:1rem;`;
+  const pUrl=posterUrl(ch);
+  if(pUrl){
+    icon.innerHTML=`<img src="${pUrl}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:9px;" onerror="this.parentNode.textContent='${(ch.emoji||"📺")}'">`;
+    icon.style.cssText=`width:36px;height:36px;border-radius:9px;overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:1rem;background:${ch.bg||"#1e1b4b"};`;
+  }else{
+    icon.textContent=ch.emoji||"📺";
+    icon.style.cssText=`background:${ch.bg||"#1e1b4b"};width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:1rem;`;
+  }
   document.getElementById("pmName").textContent=ch.name;
   document.getElementById("pmSub").textContent=ch.sub||"";
   playInModal(ch.url,ch.type||detectType(ch.url));
@@ -1661,7 +1807,7 @@ window.openAddModalWithCat=function(cat){
 };
 window.closeAddModal=function(){
   document.getElementById("addModal").classList.remove("open");
-  ["mName","mSub","mUrl","mEmoji"].forEach(id=>document.getElementById(id).value="");
+  ["mName","mSub","mUrl","mPoster","mEmoji"].forEach(id=>document.getElementById(id).value="");
   document.getElementById("btnSave").disabled=false;
   document.getElementById("btnSave").textContent="บันทึก";
 };
@@ -1684,6 +1830,7 @@ window.confirmAdd=async function(){
   const name=document.getElementById("mName").value.trim();
   const sub=document.getElementById("mSub").value.trim();
   const url=document.getElementById("mUrl").value.trim();
+  const poster=document.getElementById("mPoster").value.trim();
   const cat=document.getElementById("mCat").value;
   const emoji=document.getElementById("mEmoji").value.trim()||"📺";
   if(!name||!url){showToast("กรุณากรอกชื่อและ URL");return;}
@@ -1695,7 +1842,7 @@ window.confirmAdd=async function(){
   try{
     await addDoc(collection(db,"channels"),{
       name,sub:sub||type.toUpperCase()+" · Live",url,type,
-      category:cat,emoji,bg:grad,createdAt:Date.now()
+      category:cat,emoji,bg:grad,poster:poster||"",createdAt:Date.now()
     });
     showToast(`✅ เพิ่ม "${name}" แล้ว`);
     closeAddModal();
@@ -1765,6 +1912,20 @@ window.addCategory=async function(){
   }catch(e){showToast("ผิดพลาด: "+e.message);}
 };
 document.getElementById("catName").addEventListener("keydown",e=>{if(e.key==="Enter")addCategory();});
+
+// ── EDIT POSTER ──
+window.editPoster=async function(id){
+  if(!isAdmin){showToast("ไม่มีสิทธิ์");return;}
+  const ch=allChannels.find(c=>c.id===id);
+  if(!ch)return;
+  const cur=ch.poster||"";
+  const input=prompt(`รูปปกของ "${ch.name}"\nวาง URL รูปภาพ (เว้นว่าง = ใช้ปกอัตโนมัติ/gradient):`,cur);
+  if(input===null)return; // กดยกเลิก
+  try{
+    await setDoc(doc(db,"channels",id),{poster:input.trim()},{merge:true});
+    showToast(input.trim()?"🖼 อัปเดตรูปปกแล้ว":"ลบรูปปกแล้ว — ใช้ปกอัตโนมัติ");
+  }catch(e){showToast("บันทึกไม่สำเร็จ: "+e.message);}
+};
 
 window.deleteCategory=async function(id,name){
   const inUse=allChannels.filter(c=>c.category===name).length;
